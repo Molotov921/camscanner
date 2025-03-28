@@ -18,6 +18,6 @@ class FileModel {
       id: map['id'],
       name: map['name'],
       photos: List<String>.from(map['photos'].split(',')),
-    };
+    );
   }
 }

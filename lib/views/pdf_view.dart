@@ -8,11 +8,13 @@ import 'dart:io';
 class PdfView extends StatelessWidget {
   final pdf = pw.Document();
 
+  PdfView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PDF View'),
+        title: const Text('PDF View'),
       ),
       body: Center(
         child: Column(
@@ -22,9 +24,9 @@ class PdfView extends StatelessWidget {
                 future: _generatePdf(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    return Text('PDF Generated');
+                    return const Text('PDF Generated');
                   } else {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
                 },
               ),
@@ -33,7 +35,7 @@ class PdfView extends StatelessWidget {
               onPressed: () {
                 _savePdf();
               },
-              child: Text('Save PDF'),
+              child: const Text('Save PDF'),
             ),
           ],
         ),

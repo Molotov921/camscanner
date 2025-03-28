@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:get/get.dart';
 import 'package:camscanner/controllers/controller.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
 class PhotoView extends StatelessWidget {
   final Controller controller = Get.put(Controller());
+
+  PhotoView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Photo View'),
+        title: const Text('Photo View'),
       ),
       body: Center(
         child: Column(
@@ -21,16 +25,24 @@ class PhotoView extends StatelessWidget {
                   itemCount: controller.photos.length,
                   itemBuilder: (context, index) {
                     final photo = controller.photos[index];
-                    return ListTile(
-                      leading: Image.file(File(photo)),
-                      title: Text('Photo ${index + 1}'),
-                      trailing: IconButton(
-                        icon: Icon(Icons.crop),
-                        onPressed: () {
-                          _showCropDialog(context, photo);
-                        },
-                      ),
-                    );
+                    final decodedImage =
+                        img.decodeImage(File(photo).readAsBytesSync());
+                    return decodedImage != null
+                        ? ListTile(
+                            leading: Image.memory(
+                              Uint8List.fromList(img.encodeJpg(decodedImage)),
+                            ),
+                            title: Text('Photo ${index + 1}'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.crop),
+                              onPressed: () {
+                                _showCropDialog(context, photo);
+                              },
+                            ),
+                          )
+                        : const ListTile(
+                            title: Text('Invalid Image'),
+                          );
                   },
                 );
               }),
@@ -39,7 +51,7 @@ class PhotoView extends StatelessWidget {
               onPressed: () {
                 // Apply filter to selected photo
               },
-              child: Text('Apply Filter'),
+              child: const Text('Apply Filter'),
             ),
           ],
         ),
@@ -57,24 +69,25 @@ class PhotoView extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Crop Photo'),
+          title: const Text('Crop Photo'),
           content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: xController,
-                decoration: InputDecoration(hintText: 'X'),
+                decoration: const InputDecoration(hintText: 'X'),
               ),
               TextField(
                 controller: yController,
-                decoration: InputDecoration(hintText: 'Y'),
+                decoration: const InputDecoration(hintText: 'Y'),
               ),
               TextField(
                 controller: widthController,
-                decoration: InputDecoration(hintText: 'Width'),
+                decoration: const InputDecoration(hintText: 'Width'),
               ),
               TextField(
                 controller: heightController,
-                decoration: InputDecoration(hintText: 'Height'),
+                decoration: const InputDecoration(hintText: 'Height'),
               ),
             ],
           ),
@@ -83,18 +96,26 @@ class PhotoView extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                final x = int.parse(xController.text);
-                final y = int.parse(yController.text);
-                final width = int.parse(widthController.text);
-                final height = int.parse(heightController.text);
-                controller.cropPhoto(photoPath, x, y, width, height);
+                final x = int.tryParse(xController.text) ?? 0;
+                final y = int.tryParse(yController.text) ?? 0;
+                final width = int.tryParse(widthController.text) ?? 100;
+                final height = int.tryParse(heightController.text) ?? 100;
+
+                final originalImage =
+                    img.decodeImage(File(photoPath).readAsBytesSync());
+                if (originalImage != null) {
+                  final croppedImage =
+                      controller.cropPhoto(originalImage, x, y, width, height);
+                  // Optionally, save the cropped image to file
+                }
+
                 Navigator.of(context).pop();
               },
-              child: Text('Crop'),
+              child: const Text('Crop'),
             ),
           ],
         );

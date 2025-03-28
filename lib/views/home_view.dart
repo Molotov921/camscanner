@@ -5,11 +5,13 @@ import 'package:camscanner/controllers/controller.dart';
 class HomeView extends StatelessWidget {
   final Controller controller = Get.put(Controller());
 
+  HomeView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('CamScanner App'),
+        title: const Text('CamScanner App'),
       ),
       body: Column(
         children: [
@@ -34,7 +36,7 @@ class HomeView extends StatelessWidget {
             onPressed: () {
               // Export photos as PDF
             },
-            child: Text('Export as PDF'),
+            child: const Text('Export as PDF'),
           ),
         ],
       ),
@@ -42,7 +44,7 @@ class HomeView extends StatelessWidget {
         onPressed: () {
           _showFileNameDialog(context);
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -53,24 +55,24 @@ class HomeView extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Enter File Name'),
+          title: const Text('Enter File Name'),
           content: TextField(
             controller: fileNameController,
-            decoration: InputDecoration(hintText: 'File Name'),
+            decoration: const InputDecoration(hintText: 'File Name'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 controller.createFile(fileNameController.text);
                 Navigator.of(context).pop();
               },
-              child: Text('Create'),
+              child: const Text('Create'),
             ),
           ],
         );
