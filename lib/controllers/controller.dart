@@ -6,6 +6,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Controller extends GetxController {
   final DatabaseService _databaseService = DatabaseService();
@@ -13,6 +14,19 @@ class Controller extends GetxController {
 
   var files = <FileModel>[].obs; // Observable list of files
   var photos = <String>[].obs; // Observable list of photos
+
+  @override
+  void onInit() {
+    super.onInit();
+    requestPermissions();
+  }
+
+  Future<void> requestPermissions() async {
+    await [
+      Permission.camera,
+      Permission.storage,
+    ].request();
+  }
 
   Future<void> createFile(String name) async {
     final file = FileModel(
